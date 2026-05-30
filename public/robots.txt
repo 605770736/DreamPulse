@@ -1,0 +1,22 @@
+# DreamPulse 搜索引擎爬虫规则
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# 禁止爬取成人版块内容
+Disallow: /section/adult
+Disallow: /age-verify
+
+# 禁止爬取 API 路由
+Disallow: /api/
+
+# 禁止爬取认证相关页面
+Disallow: /auth/
+Disallow: /admin/
+
+# 禁止爬取用户个人中心
+Disallow: /profile/
+
+# Sitemap
+Sitemap: https://dreampulse.pages.dev/sitemap.xml

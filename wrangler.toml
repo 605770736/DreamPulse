@@ -1,0 +1,33 @@
+# DreamPulse 主站 Cloudflare Pages 配置
+
+name = "dreampulse"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = ".vercel/output/static"
+
+# ============================================
+# D1 数据库绑定
+# ============================================
+[[d1_databases]]
+binding = "DB"
+database_name = "dreampulse-db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# ============================================
+# R2 存储绑定（封面图、用户头像等）
+# ============================================
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "dreampulse-assets"
+
+# ============================================
+# KV 命名空间绑定（页面缓存、会话存储）
+# ============================================
+[[kv_namespaces]]
+binding = "KV"
+id = "YOUR_KV_NAMESPACE_ID"
+
+# ============================================
+# 环境变量（敏感信息通过 Cloudflare Dashboard 设置）
+# ============================================
+[vars]
+NEXT_PUBLIC_SITE_URL = "https://dreampulse.pages.dev"

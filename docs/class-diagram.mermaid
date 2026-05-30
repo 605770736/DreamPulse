@@ -1,0 +1,146 @@
+classDiagram
+    class User {
+        +string id
+        +string email
+        +string name
+        +string avatarUrl
+        +string role
+        +string locale
+        +boolean ageVerified
+        +string phone
+        +string createdAt
+        +string updatedAt
+    }
+
+    class Account {
+        +string id
+        +string userId
+        +string type
+        +string provider
+        +string providerAccountId
+        +string refreshToken
+        +string accessToken
+        +number expiresAt
+    }
+
+    class Session {
+        +string id
+        +string userId
+        +string sessionToken
+        +string expires
+    }
+
+    class Category {
+        +string id
+        +string name
+        +string nameEn
+        +string slug
+        +string icon
+        +number sortOrder
+        +boolean isAdult
+        +boolean isVisible
+        +string createdAt
+    }
+
+    class Article {
+        +string id
+        +string title
+        +string titleEn
+        +string summary
+        +string summaryEn
+        +string originalUrl
+        +string originalSource
+        +string categoryId
+        +string language
+        +string coverImage
+        +string status
+        +number viewCount
+        +number likeCount
+        +number commentCount
+        +string publishedAt
+        +string createdAt
+        +string updatedAt
+    }
+
+    class Comment {
+        +string id
+        +string articleId
+        +string userId
+        +string parentId
+        +string content
+        +string status
+        +string createdAt
+        +string updatedAt
+    }
+
+    class Like {
+        +string id
+        +string userId
+        +string targetType
+        +string targetId
+        +string createdAt
+    }
+
+    class Favorite {
+        +string id
+        +string userId
+        +string articleId
+        +string createdAt
+    }
+
+    class Follow {
+        +string id
+        +string followerId
+        +string followingId
+        +string createdAt
+    }
+
+    class CrawlSource {
+        +string id
+        +string name
+        +string url
+        +string language
+        +string type
+        +string categoryId
+        +number crawlInterval
+        +string lastCrawledAt
+        +boolean isActive
+        +string createdAt
+    }
+
+    class AuditLog {
+        +string id
+        +string targetType
+        +string targetId
+        +string action
+        +string operatorId
+        +string reason
+        +string createdAt
+    }
+
+    class AgeVerification {
+        +string id
+        +string userId
+        +string phone
+        +string code
+        +boolean isVerified
+        +string expiresAt
+        +string createdAt
+    }
+
+    User "1" --o "n" Account : has
+    User "1" --o "n" Session : has
+    User "1" --o "n" Article : authors
+    User "1" --o "n" Comment : writes
+    User "1" --o "n" Like : gives
+    User "1" --o "n" Favorite : collects
+    User "1" --o "n" Follow : follows
+    User "1" --o "n" Follow : followedBy
+    User "1" --o "n" AgeVerification : verifies
+    Category "1" --o "n" Article : contains
+    Category "1" --o "n" CrawlSource : subscribes
+    Article "1" --o "n" Comment : has
+    Article "1" --o "n" Like : receives
+    Article "1" --o "n" Favorite : savedBy
+    Comment "1" --o "n" Comment : replies
+    Comment "1" --o "n" Like : receives

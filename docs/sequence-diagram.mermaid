@@ -1,0 +1,96 @@
+sequenceDiagram
+    participant U as 用户浏览器
+    participant CF as Cloudflare CDN
+    participant MW as Next.js Middleware
+    participant Page as 首页 RSC
+    participant D1 as Cloudflare D1
+    participant KV as Cloudflare KV
+
+    U->>CF: GET /
+    CF->>MW: 请求到达
+    MW->>MW: 读取 Cookie 中的 locale
+    MW->>MW: 若无 locale，检测 Accept-Language
+    MW->>MW: 设置 locale 到请求头 x-locale
+    MW->>Page: 转发请求
+    Page->>KV: 查询首页缓存（ISR revalidate 60s）
+    alt 缓存命中且未过期
+        KV-->>Page: 返回缓存 HTML
+    else 缓存未命中
+        Page->>D1: SELECT categories WHERE is_visible=1 ORDER BY sort_order
+        D1-->>Page: 版块列表
+        Page->>D1: SELECT articles WHERE status='published' ORDER BY published_at DESC LIMIT 20
+        D1-->>Page: 文章列表
+        Page->>KV: 写入缓存
+    end
+    Page-->>CF: SSR HTML 响应
+    CF-->>U: 返回页面（CDN 缓存）
+    U->>U: 客户端 Hydration
+    U->>U: 无限滚动加载更多（客户端 fetch）
+
+    ---
+    title 爬虫流程
+    ---
+
+    participant Cron as Cloudflare Cron
+    participant W as Crawler Worker
+    participant Src as 新闻源站点
+    participant AI as OpenAI API
+    participant R2 as Cloudflare R2
+
+    Cron->>W: 定时触发（每小时）
+    W->>D1: SELECT * FROM crawl_sources WHERE is_active=1 AND last_crawled_at < datetime('now', '-1 hour')
+    D1-->>W: 待爬取源列表
+
+    loop 每个新闻源
+        W->>Src: HTTP GET (RSS/API)
+        Src-->>W: 返回原始内容
+        W->>W: 解析内容（提取标题/正文/链接）
+        W->>D1: 查询文章是否已存在（去重：original_url）
+        
+        alt 新文章
+            W->>AI: POST /chat/completions (GPT-4o-mini)
+            Note over W,AI: Prompt: 将以下新闻改写为200字中文摘要 + 150字英文摘要
+            AI-->>W: 返回摘要文本
+            
+            alt 含封面图
+                W->>R2: 上传封面图（若需代理）
+                R2-->>W: 返回图片 URL
+            end
+            
+            W->>D1: INSERT INTO articles (title, title_en, summary, summary_en, ...)
+            W->>D1: UPDATE crawl_sources SET last_crawled_at=datetime('now')
+        else 已存在
+            W->>W: 跳过
+        end
+    end
+    
+    W->>W: 日志记录爬取结果
+
+    ---
+    title 内容审核流程
+    ---
+
+    participant User as 普通用户
+    participant API as API Route
+    participant Admin as 管理员
+    participant Audit as 审核页面
+
+    User->>API: POST /api/comments (发表评论)
+    API->>D1: INSERT INTO comments (status='published')
+    
+    Note over D1: 敏感词检测（后续接入AI审核）
+    
+    User->>API: POST /api/report (举报内容)
+    API->>D1: INSERT INTO audit_logs (action='pending')
+    
+    Admin->>Audit: 打开审核页面
+    Audit->>API: GET /api/admin/audit?status=pending
+    API->>D1: SELECT * FROM audit_logs WHERE action='pending'
+    D1-->>API: 待审核列表
+    API-->>Audit: 展示列表
+    
+    Admin->>Audit: 审核操作（通过/拒绝/隐藏）
+    Audit->>API: PUT /api/admin/audit
+    API->>D1: UPDATE comments SET status='hidden' WHERE id=?
+    API->>D1: INSERT INTO audit_logs (action='reject')
+    API-->>Audit: 操作成功

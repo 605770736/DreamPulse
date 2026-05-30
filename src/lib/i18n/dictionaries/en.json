@@ -1,0 +1,168 @@
+{
+  "common": {
+    "siteName": "DreamPulse",
+    "siteDescription": "AI-Driven News Aggregation Platform",
+    "loading": "Loading...",
+    "loadMore": "Load More",
+    "noData": "No data available",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "back": "Back",
+    "close": "Close",
+    "submit": "Submit",
+    "success": "Success",
+    "failed": "Failed",
+    "language": "Language",
+    "switchLanguage": "Switch Language"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "admin": "Admin",
+    "ageVerify": "Age Verification"
+  },
+  "category": {
+    "tech": "Technology",
+    "society": "Society",
+    "emotion": "Emotion",
+    "gossip": "Celebrity Gossip",
+    "media": "Audio & Video",
+    "sports": "Sports",
+    "adult": "Adult"
+  },
+  "article": {
+    "title": "Articles",
+    "latestNews": "Latest News",
+    "featured": "Featured",
+    "readMore": "Read More",
+    "viewOriginal": "View Original",
+    "aiSummary": "AI Summary",
+    "viewCount": "views",
+    "likeCount": "likes",
+    "commentCount": "comments",
+    "publishedAt": "Published at",
+    "source": "Source",
+    "relatedArticles": "Related Articles",
+    "noArticles": "No articles found",
+    "loadMore": "Load more articles"
+  },
+  "comment": {
+    "title": "Comments",
+    "placeholder": "Share your thoughts...",
+    "submit": "Post Comment",
+    "reply": "Reply",
+    "delete": "Delete",
+    "noComments": "No comments yet. Be the first!",
+    "replyTo": "Reply to"
+  },
+  "auth": {
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Sign in to your DreamPulse account",
+    "registerTitle": "Join DreamPulse",
+    "registerSubtitle": "Create an account to start your journey",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Display Name",
+    "loginButton": "Sign In",
+    "registerButton": "Create Account",
+    "loginWithGoogle": "Continue with Google",
+    "loginWithGitHub": "Continue with GitHub",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUpHere": "Sign up here",
+    "signInHere": "Sign in here",
+    "forgotPassword": "Forgot password?",
+    "logoutConfirm": "Are you sure you want to sign out?"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editProfile": "Edit Profile",
+    "avatar": "Avatar",
+    "name": "Display Name",
+    "email": "Email",
+    "language": "Language Preference",
+    "ageVerified": "Age Verified",
+    "ageNotVerified": "Not Verified",
+    "verifyNow": "Verify Now",
+    "myFavorites": "My Favorites",
+    "myComments": "My Comments",
+    "myFollows": "Following"
+  },
+  "ageVerify": {
+    "title": "Age Verification",
+    "subtitle": "To access adult content, please verify your age",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number (e.g., +8613800138000)",
+    "sendCode": "Send Code",
+    "code": "Verification Code",
+    "codePlaceholder": "Enter 6-digit code",
+    "verify": "Verify",
+    "codeSent": "Verification code sent",
+    "verified": "Age verified successfully",
+    "verifyFailed": "Verification failed",
+    "codeExpired": "Code expired, please resend",
+    "resendIn": "Resend in {seconds}s",
+    "redirectNotice": "You will be redirected to the requested page after verification."
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "audit": "Content Review",
+    "users": "User Management",
+    "categories": "Category Management",
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalArticles": "Total Articles",
+      "totalComments": "Total Comments",
+      "todayViews": "Today's Views"
+    },
+    "audit": {
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "approve": "Approve",
+      "reject": "Reject",
+      "hide": "Hide",
+      "reason": "Reason"
+    },
+    "users": {
+      "ban": "Ban",
+      "unban": "Unban",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "banned": "Banned"
+    }
+  },
+  "footer": {
+    "about": "About DreamPulse",
+    "aboutDescription": "An AI-driven news aggregation platform that curates global news with intelligent summaries.",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 DreamPulse. All rights reserved."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for has vanished into stardust. Let's head back home and chase new dreams.",
+    "backHome": "Back to Home"
+  },
+  "share": {
+    "title": "Share",
+    "copyLink": "Copy Link",
+    "copied": "Link copied!",
+    "twitter": "Share on Twitter",
+    "facebook": "Share on Facebook",
+    "weibo": "Share on Weibo"
+  }
+}
