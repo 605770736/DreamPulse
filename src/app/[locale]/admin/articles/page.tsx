@@ -13,7 +13,7 @@ interface AdminArticlesPageProps {
 export default async function AdminArticlesPage({ params, searchParams }: AdminArticlesPageProps) {
   const { locale } = await params;
   const filters = await searchParams;
-  const db = getDB();
+  const db = await getDB();
 
   const page = Math.max(1, parseInt(filters.page ?? '1', 10));
   const pageSize = 20;

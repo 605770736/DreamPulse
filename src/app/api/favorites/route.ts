@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const { page, pageSize } = parsed.data;
     const offset = (page - 1) * pageSize;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询收藏总数
     const countResult = await db
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { articleId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 检查文章是否存在
     const article = await db
@@ -136,7 +136,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { articleId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 删除收藏记录
     const result = await db

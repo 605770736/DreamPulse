@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询文章
     const article = await db

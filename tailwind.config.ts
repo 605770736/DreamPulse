@@ -11,45 +11,47 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 深色主题品牌色
+        'bg-deep': '#2a1555',
+        'bg-mid': '#1e1040',
+        'bg-dark': '#1a0a30',
+        'purple-light': '#a78bfa',
+        'purple-mid': '#7c3aed',
+        'pink-warm': '#f472b6',
+        'orange-sunset': '#fb923c',
+        'peach': '#fde68a',
+        'text-primary': '#f5f3ff',
+        'text-secondary': 'rgba(245, 243, 255, 0.7)',
+        'glass-bg': 'rgba(255, 255, 255, 0.07)',
+        'glass-border': 'rgba(255, 255, 255, 0.12)',
+        'cat-tech': '#818cf8',
+        'cat-society': '#34d399',
+        'cat-emotion': '#f472b6',
+        'cat-video': '#fbbf24',
+        'cat-sports': '#fb923c',
+        'cat-entertainment': '#c084fc',
+        // legacy aliases for admin pages
         'dream': {
-          'dark': '#0A0E27',
-          'darker': '#000000',
-          'card': 'rgba(15, 23, 42, 0.8)',
-          'border': 'rgba(148, 163, 184, 0.1)',
+          'dark': '#2a1555',
+          'darker': '#1e1040',
+          'card': 'rgba(255, 255, 255, 0.07)',
+          'border': 'rgba(255, 255, 255, 0.12)',
         },
         'accent': {
-          'start': '#4F46E5',
-          'end': '#7C3AED',
-          'glow': 'rgba(79, 70, 229, 0.3)',
+          'start': '#a78bfa',
+          'end': '#7c3aed',
+          'glow': 'rgba(167, 139, 250, 0.3)',
         },
-        // 文本色
-        'text-primary': '#F1F5F9',
-        'text-secondary': '#94A3B8',
       },
       borderRadius: {
+        'sm': '8px',
+        'md': '16px',
+        'lg': '24px',
+        'full': '999px',
         'dream': '12px',
       },
-      backgroundImage: {
-        // 渐变背景
-        'gradient-accent': 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))',
-        'gradient-glow': 'radial-gradient(circle, var(--color-glow), transparent 70%)',
-      },
       fontFamily: {
-        // 品牌字体栈
         sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-      },
-      animation: {
-        // 脉冲动画——品牌「脉搏」元素
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
-      },
-      keyframes: {
-        glow: {
-          '0%': { boxShadow: '0 0 5px var(--color-glow)' },
-          '100%': { boxShadow: '0 0 20px var(--color-glow), 0 0 40px var(--color-glow)' },
-        },
       },
     },
   },

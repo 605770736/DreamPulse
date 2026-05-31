@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { targetType, targetId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 检查是否已点赞
     const existing = await db
@@ -71,7 +71,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { targetType, targetId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 删除点赞记录
     await db

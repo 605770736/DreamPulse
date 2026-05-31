@@ -1,5 +1,22 @@
 import { getDB } from '@/lib/db/client';
+import { revalidatePath } from 'next/cache';
 import type { Locale } from '@/lib/i18n/config';
+
+async function toggleBan(formData: FormData) {
+  'use server';
+  const id = formData.get('id') as string;
+  const action = formData.get('action') as string;
+  const locale = formData.get('locale') as string;
+  const db = await getDB();
+  const newRole = action === 'ban' ? 'banned' : 'user';
+  await db.prepare('UPDATE users SET role = ? WHERE id = ?').bind(newRole, id).run();
+  const logId = crypto.randomUUID();
+  await db
+    .prepare('INSERT INTO audit_logs (id, target_type, target_id, action, operator_id, reason) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(logId, 'user', id, action, 'admin', null)
+    .run();
+  revalidatePath(`/${locale}/admin/users`);
+}
 
 interface AdminUsersPageProps {
   params: Promise<{ locale: Locale }>;
@@ -13,7 +30,7 @@ interface AdminUsersPageProps {
 export default async function AdminUsersPage({ params, searchParams }: AdminUsersPageProps) {
   const { locale } = await params;
   const filters = await searchParams;
-  const db = getDB();
+  const db = await getDB();
 
   const page = Math.max(1, parseInt(filters.page ?? '1', 10));
   const pageSize = 20;
@@ -149,9 +166,22 @@ export default async function AdminUsersPage({ params, searchParams }: AdminUser
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="text-xs text-accent-start hover:underline">
-                          {locale === 'en' ? 'Edit' : '编辑'}
-                        </button>
+                        {user.role !== 'admin' && (
+                          <form action={toggleBan}>
+                            <input type="hidden" name="id" value={user.id as string} />
+                            <input type="hidden" name="locale" value={locale} />
+                            {(user.role as string) === 'banned' ? (
+                              <input type="hidden" name="action" value="unban" />
+                            ) : (
+                              <input type="hidden" name="action" value="ban" />
+                            )}
+                            <button className="text-xs text-red-400 hover:underline">
+                              {(user.role as string) === 'banned'
+                                ? (locale === 'en' ? 'Unban' : '解封')
+                                : (locale === 'en' ? 'Ban' : '封禁')}
+                            </button>
+                          </form>
+                        )}
                       </div>
                     </td>
                   </tr>

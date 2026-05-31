@@ -5,13 +5,20 @@ interface AdminCategoriesPageProps {
   params: Promise<{ locale: Locale }>;
 }
 
+async function deleteCategory(formData: FormData) {
+  'use server';
+  const id = formData.get('id') as string;
+  const db = await getDB();
+  await db.prepare('DELETE FROM categories WHERE id = ? AND slug != ?').bind(id, 'adult').run();
+}
+
 /**
  * 版块管理页
  * 版块列表 + 编辑排序 + 新增/编辑弹窗
  */
 export default async function AdminCategoriesPage({ params }: AdminCategoriesPageProps) {
   const { locale } = await params;
-  const db = getDB();
+  const db = await getDB();
 
   // 查询所有版块
   const categories = await db
@@ -25,9 +32,12 @@ export default async function AdminCategoriesPage({ params }: AdminCategoriesPag
         <h1 className="text-2xl font-bold text-text-primary">
           {locale === 'en' ? 'Category Management' : '版块管理'}
         </h1>
-        <button className="rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90">
-          {locale === 'en' ? 'Add Category' : '新增版块'}
-        </button>
+        <a
+          href={`/${locale}/admin`}
+          className="rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        >
+          {locale === 'en' ? 'Back to Dashboard' : '返回仪表盘'}
+        </a>
       </div>
 
       {/* 版块列表 */}
@@ -87,14 +97,14 @@ export default async function AdminCategoriesPage({ params }: AdminCategoriesPag
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="text-xs text-accent-start hover:underline">
-                          {locale === 'en' ? 'Edit' : '编辑'}
-                        </button>
-                        {(cat.slug as string) !== 'adult' && (
-                          <button className="text-xs text-red-400 hover:underline">
-                            {locale === 'en' ? 'Delete' : '删除'}
-                          </button>
-                        )}
+                        <form action={deleteCategory}>
+                          <input type="hidden" name="id" value={cat.id as string} />
+                          {(cat.slug as string) !== 'adult' && (
+                            <button className="text-xs text-red-400 hover:underline">
+                              {locale === 'en' ? 'Delete' : '删除'}
+                            </button>
+                          )}
+                        </form>
                       </div>
                     </td>
                   </tr>

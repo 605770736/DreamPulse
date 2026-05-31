@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { query } from '@/lib/db/client';
+import { query, queryOne } from '@/lib/db/client';
 import { apiSuccess, apiPaginated, apiBadRequest, handleApiError } from '@/lib/utils/api';
 import { articleListQuerySchema } from '@/lib/utils/validators';
 import type { ArticleRow, CategoryRow } from '@/lib/db/schema';
@@ -83,9 +83,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 辅助函数：查询单行
-async function queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
-  const { DB } = (await import('@cloudflare/next-on-pages')).getRequestContext().env as unknown as { DB: D1Database };
-  const result = await DB.prepare(sql).bind(...params).first<T>();
-  return result ?? null;
-}

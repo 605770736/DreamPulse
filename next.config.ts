@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
   },
 
   // Cloudflare Pages 适配：标记所有路由为 Edge Runtime
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
 
   // 环境变量暴露到客户端
   env: {

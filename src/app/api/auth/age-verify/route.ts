@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { phone, code } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询验证码记录
     const record = await db

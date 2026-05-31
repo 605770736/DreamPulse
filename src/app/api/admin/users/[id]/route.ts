@@ -22,7 +22,7 @@ export async function PATCH(
     }
 
     const data = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 检查用户是否存在
     const user = await db

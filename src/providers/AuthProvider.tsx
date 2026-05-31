@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useCallback, useState, type ReactNode } from 'react';
+import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Toast, type ToastData } from '@/components/common/Toast';
 
 /** 认证用户类型（与 useAuth 一致） */
@@ -69,9 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // 初始化加载
-  useState(() => {
+  useEffect(() => {
     refresh();
-  });
+  }, [refresh]);
 
   const isAuthenticated = user !== null;
 

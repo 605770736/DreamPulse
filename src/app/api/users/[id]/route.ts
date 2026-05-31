@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询用户基本信息
     const user = await db

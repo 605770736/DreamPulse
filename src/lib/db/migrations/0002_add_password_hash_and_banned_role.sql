@@ -5,9 +5,7 @@
 -- 说明: 添加 password_hash 字段 + role 增加 'banned' 值
 -- ==============================
 
--- 添加密码哈希字段（用于邮箱注册用户）
-ALTER TABLE users ADD COLUMN password_hash TEXT;
-
+-- password_hash 已在 0001 建表时定义，无需 ALTER TABLE
 -- 更新 role 约束：支持 'banned' 状态
 -- SQLite 不支持 ALTER COLUMN，需要重建表
 -- 步骤：创建新表 → 迁移数据 → 删除旧表 → 重命名

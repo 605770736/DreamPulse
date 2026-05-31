@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { phone } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 生成6位随机验证码
     const code = Math.floor(100000 + Math.random() * 900000).toString();

@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const db = getDB();
+    const db = await getDB();
 
     // 查询总数
     const countResult = await db
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-    const db = getDB();
+    const db = await getDB();
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
 

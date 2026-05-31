@@ -16,7 +16,7 @@ export async function GET(
   try {
     await requireAdmin();
     const { id } = await params;
-    const db = getDB();
+    const db = await getDB();
 
     const article = await db
       .prepare(
@@ -56,7 +56,7 @@ export async function PATCH(
       return Response.json(apiBadRequest(parsed.error.issues[0].message), { status: 400 });
     }
 
-    const db = getDB();
+    const db = await getDB();
 
     // 检查文章是否存在
     const existing = await db
@@ -115,7 +115,7 @@ export async function DELETE(
   try {
     await requireAdmin();
     const { id } = await params;
-    const db = getDB();
+    const db = await getDB();
 
     const result = await db
       .prepare('DELETE FROM articles WHERE id = ?')

@@ -1,9 +1,11 @@
 import { query, queryOne, execute } from '@/lib/db/client';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { isValidLocale, DEFAULT_LOCALE } from '@/lib/i18n/config';
+import { auth } from '@/lib/auth/config';
 import { ArticleContent } from '@/components/article/ArticleContent';
 import { ActionBar } from '@/components/article/ActionBar';
 import { RelatedArticles } from '@/components/article/RelatedArticles';
+import { CommentSection } from '@/components/article/CommentSection';
 import type { ArticleRow, CategoryRow } from '@/lib/db/schema';
 
 /**
@@ -28,9 +30,15 @@ export default async function ArticlePage({
     return (
       <div className="mx-auto max-w-4xl px-4 py-16 text-center">
         <h1 className="mb-4 text-2xl font-bold">{dict.common.noData}</h1>
+        <a href={`/${locale}`} className="text-accent-start hover:text-accent-end transition-colors">
+          {locale === 'en' ? 'Back to Home' : '返回首页'}
+        </a>
       </div>
     );
   }
+
+  // 获取当前登录用户
+  const session = await auth();
 
   // 查询版块信息
   const category = await queryOne<CategoryRow>(
@@ -112,6 +120,13 @@ export default async function ArticlePage({
           dict={dict}
         />
       )}
+
+      {/* 评论区 */}
+      <CommentSection
+        articleId={id}
+        locale={locale}
+        currentUserId={session?.user?.id}
+      />
     </div>
   );
 }

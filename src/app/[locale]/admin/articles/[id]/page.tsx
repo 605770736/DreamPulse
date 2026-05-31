@@ -12,7 +12,7 @@ interface AdminArticleDetailPageProps {
  */
 export default async function AdminArticleDetailPage({ params }: AdminArticleDetailPageProps) {
   const { locale, id } = await params;
-  const db = getDB();
+  const db = await getDB();
 
   // 查询文章详情
   const article = await db
@@ -186,11 +186,13 @@ export default async function AdminArticleDetailPage({ params }: AdminArticleDet
             formAction={async (formData) => {
               'use server';
               const newStatus = formData.get('status') as string;
-              const db = getDB();
+  const db = await getDB();
               await db
                 .prepare("UPDATE articles SET status = ?, updated_at = datetime('now') WHERE id = ?")
                 .bind(newStatus, id)
                 .run();
+              const { revalidatePath } = await import('next/cache');
+              revalidatePath(`/${locale}/admin/articles/${id}`);
             }}
             className="rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >

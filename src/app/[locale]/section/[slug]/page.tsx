@@ -34,6 +34,9 @@ export default async function SectionPage({
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 text-center">
         <h1 className="mb-4 text-2xl font-bold">{dict.common.noData}</h1>
+        <a href={`/${locale}`} className="text-accent-start hover:text-accent-end transition-colors">
+          {locale === 'en' ? 'Back to Home' : '返回首页'}
+        </a>
       </div>
     );
   }

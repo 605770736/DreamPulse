@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return Response.json(apiBadRequest('不能关注自己'), { status: 400 });
     }
 
-    const db = getDB();
+    const db = await getDB();
 
     // 检查目标用户是否存在
     const targetUser = await db
@@ -75,7 +75,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { userId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 删除关注记录
     const result = await db

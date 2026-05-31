@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
+import { useAuthContext } from '@/providers/AuthProvider';
 import type { Locale } from '@/lib/i18n/config';
 
 /** 导航项 */
@@ -78,12 +79,25 @@ interface AdminLayoutProps {
  * 左侧导航栏 + 主内容区，需管理员权限
  */
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
+  const { user, isAuthenticated, isLoading } = useAuthContext();
+  const router = useRouter();
   const pathname = usePathname();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [locale, setLocale] = useState<Locale>('zh');
 
   // 解析 locale
   params.then((p) => setLocale(p.locale));
+
+  // 权限校验
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace(`/${locale}/login`);
+      } else if (user?.role !== 'admin') {
+        router.replace(`/${locale}`);
+      }
+    }
+  }, [isLoading, isAuthenticated, user, locale, router]);
 
   /** 判断导航项是否激活 */
   const isActive = (href: string): boolean => {

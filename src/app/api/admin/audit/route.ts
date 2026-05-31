@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     const { page, pageSize } = parsed.data;
     const offset = (page - 1) * pageSize;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询待审核的审核日志
     // 这里查询所有审核记录作为审核队列

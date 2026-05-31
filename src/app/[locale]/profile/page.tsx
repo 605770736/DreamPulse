@@ -85,25 +85,25 @@ export default async function ProfilePage({
       {/* 快捷入口 */}
       <div className="grid gap-4 sm:grid-cols-3">
         <a
-          href="#favorites"
+          href={`/${locale}`}
           className="glass flex items-center gap-3 p-4 transition-colors hover:border-accent-start/30"
         >
-          <span className="text-2xl">⭐</span>
-          <span className="text-text-primary">{dict.profile.myFavorites}</span>
+          <span className="text-2xl">🏠</span>
+          <span className="text-text-primary">{locale === 'en' ? 'Home' : '返回首页'}</span>
         </a>
         <a
-          href="#comments"
+          href={`/${locale}/section/tech`}
           className="glass flex items-center gap-3 p-4 transition-colors hover:border-accent-start/30"
         >
-          <span className="text-2xl">💬</span>
-          <span className="text-text-primary">{dict.profile.myComments}</span>
+          <span className="text-2xl">📰</span>
+          <span className="text-text-primary">{locale === 'en' ? 'Browse Articles' : '浏览文章'}</span>
         </a>
         <a
-          href="#follows"
+          href={`/${locale}`}
           className="glass flex items-center gap-3 p-4 transition-colors hover:border-accent-start/30"
         >
-          <span className="text-2xl">👥</span>
-          <span className="text-text-primary">{dict.profile.myFollows}</span>
+          <span className="text-2xl">🔙</span>
+          <span className="text-text-primary">{locale === 'en' ? 'Back' : '返回上一页'}</span>
         </a>
       </div>
     </div>

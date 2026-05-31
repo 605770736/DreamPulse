@@ -30,6 +30,7 @@ export default async function RegisterPage({
           method="POST"
           className="space-y-4"
         >
+          <input type="hidden" name="locale" value={locale} />
           <div>
             <label className="mb-1 block text-sm text-text-secondary">
               {dict.auth.name}

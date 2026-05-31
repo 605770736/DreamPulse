@@ -27,7 +27,7 @@ export async function uploadToR2(
   data: ArrayBuffer | ReadableStream | string,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
-  const r2 = getR2();
+  const r2 = await getR2();
 
   await r2.put(key, data, {
     httpMetadata: {
@@ -48,7 +48,7 @@ export async function uploadToR2(
  * @returns R2ObjectBody 或 null（文件不存在）
  */
 export async function getFromR2(key: string): Promise<R2ObjectBody | null> {
-  const r2 = getR2();
+  const r2 = await getR2();
   return r2.get(key);
 }
 
@@ -58,7 +58,7 @@ export async function getFromR2(key: string): Promise<R2ObjectBody | null> {
  * @param key - 存储键名
  */
 export async function deleteFromR2(key: string): Promise<void> {
-  const r2 = getR2();
+  const r2 = await getR2();
   await r2.delete(key);
 }
 

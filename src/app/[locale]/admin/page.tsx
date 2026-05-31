@@ -12,7 +12,7 @@ interface AdminPageProps {
  */
 export default async function AdminDashboardPage({ params }: AdminPageProps) {
   const { locale } = await params;
-  const db = getDB();
+  const db = await getDB();
 
   // 统计数据
   const articleCount = await db

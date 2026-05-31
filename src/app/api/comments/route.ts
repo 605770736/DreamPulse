@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { articleId, content, parentId } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     const id = crypto.randomUUID();
     await db

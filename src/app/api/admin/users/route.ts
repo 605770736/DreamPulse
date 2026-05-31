@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const db = getDB();
+    const db = await getDB();
 
     // 查询总数
     const countResult = await db

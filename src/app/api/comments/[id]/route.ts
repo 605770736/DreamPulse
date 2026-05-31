@@ -14,7 +14,7 @@ export async function DELETE(
   try {
     const user = await requireAuth();
     const { id } = await params;
-    const db = getDB();
+    const db = await getDB();
 
     // 查询评论
     const comment = await db

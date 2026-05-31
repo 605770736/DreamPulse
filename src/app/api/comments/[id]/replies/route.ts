@@ -27,7 +27,7 @@ export async function GET(
     const { page, pageSize } = parsed.data;
     const offset = (page - 1) * pageSize;
 
-    const db = getDB();
+    const db = await getDB();
     const countResult = await db
       .prepare("SELECT COUNT(*) as total FROM comments WHERE parent_id = ? AND status = 'published'")
       .bind(id)
@@ -74,7 +74,7 @@ export async function POST(
     }
 
     const { articleId, content } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     const commentId = crypto.randomUUID();
     await db

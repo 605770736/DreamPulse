@@ -15,24 +15,14 @@ import bcrypt from 'bcryptjs';
 import type { Adapter } from '@auth/core/adapters';
 
 /**
- * 惰性创建 D1Adapter
- * 在每次请求时获取 D1 数据库实例并创建适配器
- * 这是因为 getDB() 依赖 Cloudflare 的 getRequestContext()，
- * 仅在请求处理期间可用
- */
-function createD1Adapter(): Adapter {
-  const db = getDB();
-  return D1Adapter(db as unknown as Parameters<typeof D1Adapter>[0]);
-}
-
-/**
  * Auth.js 配置对象
  * 在 Cloudflare Pages Edge Runtime 下运行
  */
+const db = await getDB();
+const d1Adapter = D1Adapter(db as unknown as Parameters<typeof D1Adapter>[0]);
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // 适配器：使用惰性函数返回 D1 适配器
-  // NextAuth v5 支持 adapter 为函数类型
-  adapter: createD1Adapter(),
+  adapter: d1Adapter as Adapter,
 
   // 认证提供商（当前仅邮箱密码，OAuth 后期按需添加）
   providers: [
@@ -49,7 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         // 查询用户——邮箱密码方式
-        const db = getDB();
+        const db = await getDB();
         const user = await db
           .prepare('SELECT * FROM users WHERE email = ?')
           .bind(credentials.email as string)

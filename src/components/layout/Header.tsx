@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Locale } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/get-dictionary';
+import { useAuthContext } from '@/providers/AuthProvider';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface HeaderProps {
@@ -11,18 +12,52 @@ interface HeaderProps {
   dict: Dictionary;
 }
 
-/**
- * 顶部导航栏
- * Logo、版块菜单、搜索框、语言切换、用户菜单
- */
 export function Header({ locale, dict }: HeaderProps) {
+  const { user, isAuthenticated, isLoading } = useAuthContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const nav = dict.nav as Record<string, string>;
   const categories = dict.category as Record<string, string>;
 
-  // 版块导航链接
+  useEffect(() => {
+    const onScroll = () => setScrolled(scrollY > 40);
+    addEventListener('scroll', onScroll);
+    return () => removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sections = document.querySelectorAll('[id^="sec-"], #hero');
+    const links = document.querySelectorAll('.nav-links a');
+    const onScroll = () => {
+      let current = '';
+      sections.forEach((sec) => {
+        const el = sec as HTMLElement;
+        if (scrollY >= el.offsetTop - 200) current = sec.id;
+      });
+      links.forEach((a) => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    };
+    addEventListener('scroll', onScroll);
+    return () => removeEventListener('scroll', onScroll);
+  }, []);
+
+  async function handleLogout() {
+    const { signOut } = await import('next-auth/react');
+    await signOut({ redirectTo: `/${locale}` });
+  }
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/${locale}/search?q=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  }
+
   const sectionLinks = [
     { slug: 'tech', label: categories.tech ?? '科技' },
     { slug: 'society', label: categories.society ?? '社会' },
@@ -33,68 +68,98 @@ export function Header({ locale, dict }: HeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-dream-dark/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-2">
-          {/* 脉冲图标 */}
-          <svg width="28" height="28" viewBox="0 0 32 32" className="shrink-0">
-            <defs>
-              <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#4F46E5"/>
-                <stop offset="100%" stopColor="#7C3AED"/>
-              </linearGradient>
-            </defs>
-            <path d="M3 16 Q8 6 16 16 Q24 26 29 16" stroke="url(#headerGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <circle cx="16" cy="16" r="3" fill="url(#headerGrad)"/>
-          </svg>
-          <span className="text-lg font-bold">
-            <span className="text-text-primary">Dream</span>
-            <span className="text-gradient">Pulse</span>
-          </span>
-        </Link>
+    <nav id="nav" className={`nav ${scrolled ? 'scrolled' : ''}`}>
+      <Link href={`/${locale}`} className="nav-brand">
+        <span className="pulse-dot" />
+        DreamPulse
+      </Link>
 
-        {/* 桌面版块导航 */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {sectionLinks.map((link) => (
-            <Link
-              key={link.slug}
-              href={`/${locale}/section/${link.slug}`}
-              className="rounded-lg px-3 py-1.5 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+      <ul className="nav-links">
+        {sectionLinks.map((link) => (
+          <li key={link.slug}>
+            <Link href={`/${locale}/section/${link.slug}`}>{link.label}</Link>
+          </li>
+        ))}
+      </ul>
 
-        {/* 右侧工具栏 */}
-        <div className="flex items-center gap-2">
-          {/* 搜索按钮 */}
+      <div className="nav-actions">
           <button
             onClick={() => setSearchOpen(!searchOpen)}
-            className="rounded-lg p-2 text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
+            className="btn-glass"
             aria-label={nav.search ?? '搜索'}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
             </svg>
           </button>
 
-          {/* 语言切换 */}
           <LanguageSwitcher locale={locale} />
 
-          {/* 用户菜单 */}
-          <Link
-            href={`/${locale}/login`}
-            className="hidden rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:block"
-          >
-            {nav.login}
-          </Link>
+          {isLoading ? null : isAuthenticated && user ? (
+            <div className="relative hidden sm:block">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="btn-glass flex items-center gap-2"
+              >
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-light to-pink-warm flex items-center justify-center text-[10px] font-bold text-white">
+                  {(user.name?.[0] ?? 'U').toUpperCase()}
+                </div>
+                <span className="max-w-[100px] truncate text-xs">{user.name ?? user.email}</span>
+              </button>
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-48 rounded-[16px] border border-[rgba(255,255,255,0.12)] bg-[rgba(42,21,85,0.95)] backdrop-blur-xl p-1.5 shadow-xl">
+                    <Link
+                      href={`/${locale}/profile`}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      {locale === 'en' ? 'My Profile' : '个人资料'}
+                    </Link>
+                    <Link
+                      href={`/${locale}/profile#favorites`}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      {locale === 'en' ? 'My Favorites' : '我的收藏'}
+                    </Link>
+                    {user.role === 'admin' && (
+                      <Link
+                        href={`/${locale}/admin`}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        {locale === 'en' ? 'Admin' : '管理后台'}
+                      </Link>
+                    )}
+                    <hr className="my-1 border-[rgba(255,255,255,0.12)]" />
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/10"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                      {locale === 'en' ? 'Logout' : '退出登录'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link
+              href={`/${locale}/login`}
+              className="btn-primary hidden sm:block"
+            >
+              {nav.login}
+            </Link>
+          )}
 
-          {/* 移动端菜单按钮 */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="rounded-lg p-2 text-text-secondary transition-colors hover:bg-white/5 md:hidden"
+            className="md:hidden p-2 text-text-secondary hover:text-text-primary transition-colors"
             aria-label="菜单"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -108,25 +173,24 @@ export function Header({ locale, dict }: HeaderProps) {
             </svg>
           </button>
         </div>
-      </div>
 
-      {/* 搜索栏 */}
       {searchOpen && (
-        <div className="border-t border-[var(--color-border)] px-4 py-3">
-          <div className="mx-auto max-w-2xl">
+        <div className="border-t border-[rgba(255,255,255,0.12)] px-4 py-3">
+          <form onSubmit={handleSearch} className="mx-auto max-w-2xl">
             <input
               type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={nav.search ?? '搜索...'}
-              className="w-full rounded-dream border border-[var(--color-border)] bg-dream-darker px-4 py-2 text-text-primary placeholder-text-secondary outline-none focus:border-accent-start"
+              className="w-full px-4 py-2.5 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.07)] text-text-primary placeholder-[rgba(245,243,255,0.32)] outline-none backdrop-blur-md transition-all focus:border-purple-light focus:shadow-[0_0_0_3px_rgba(167,139,250,0.12)]"
               autoFocus
             />
-          </div>
+          </form>
         </div>
       )}
 
-      {/* 移动端导航菜单 */}
       {menuOpen && (
-        <div className="border-t border-[var(--color-border)] px-4 py-3 md:hidden">
+        <div className="border-t border-[rgba(255,255,255,0.12)] px-4 py-3 md:hidden">
           <nav className="flex flex-col gap-1">
             {sectionLinks.map((link) => (
               <Link
@@ -138,16 +202,34 @@ export function Header({ locale, dict }: HeaderProps) {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href={`/${locale}/login`}
-              className="mt-2 rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-3 py-2 text-center text-sm font-medium text-white"
-              onClick={() => setMenuOpen(false)}
-            >
-              {nav.login}
-            </Link>
+            {isLoading ? null : isAuthenticated && user ? (
+              <>
+                <Link
+                  href={`/${locale}/profile`}
+                  className="mt-2 rounded-lg bg-purple-mid/20 px-3 py-2 text-center text-sm font-medium text-purple-light"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {user.name ?? user.email}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-lg px-3 py-2 text-center text-sm text-red-400 transition-colors hover:bg-red-500/10"
+                >
+                  {locale === 'en' ? 'Logout' : '退出登录'}
+                </button>
+              </>
+            ) : (
+              <Link
+                href={`/${locale}/login`}
+                className="mt-2 rounded-full bg-gradient-to-r from-purple-mid to-pink-warm px-3 py-2 text-center text-sm font-medium text-white"
+                onClick={() => setMenuOpen(false)}
+              >
+                {nav.login}
+              </Link>
+            )}
           </nav>
         </div>
       )}
-    </header>
+    </nav>
   );
 }

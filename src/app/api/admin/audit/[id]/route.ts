@@ -23,7 +23,7 @@ export async function PATCH(
     }
 
     const { targetType, targetId, action, reason } = parsed.data;
-    const db = getDB();
+    const db = await getDB();
 
     // 根据目标类型和操作更新对应状态
     if (targetType === 'article') {

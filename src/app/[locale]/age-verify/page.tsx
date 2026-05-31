@@ -120,6 +120,15 @@ export default function AgeVerifyPage({
           </p>
         </div>
 
+        <div className="mb-4">
+          <button
+            onClick={() => router.back()}
+            className="text-sm text-text-secondary hover:text-accent-start transition-colors"
+          >
+            ← {locale === 'en' ? 'Back' : '返回'}
+          </button>
+        </div>
+
         {error && (
           <div className="mb-4 rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
             {error}

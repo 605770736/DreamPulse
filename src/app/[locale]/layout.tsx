@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { ScrollReveal } from '@/components/common/ScrollReveal';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { isValidLocale, DEFAULT_LOCALE } from '@/lib/i18n/config';
 import { AuthProvider } from '@/providers/AuthProvider';
@@ -48,9 +49,10 @@ export default async function LocaleLayout({
   return (
     <AuthProvider>
       <ToastProvider>
+        <ScrollReveal />
         <div className="flex min-h-screen flex-col">
           <Header locale={locale} dict={dict} />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pt-[72px]">{children}</main>
           <Footer locale={locale} dict={dict} />
         </div>
       </ToastProvider>

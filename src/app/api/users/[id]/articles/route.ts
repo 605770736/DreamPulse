@@ -25,7 +25,7 @@ export async function GET(
 
     const { page, pageSize } = parsed.data;
     const offset = (page - 1) * pageSize;
-    const db = getDB();
+    const db = await getDB();
 
     // 注意：当前 articles 表没有 author_id 字段
     // 爬虫入库的文章无作者关联，此接口预留用户原创文章查询
