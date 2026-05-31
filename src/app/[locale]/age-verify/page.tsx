@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { isValidLocale, DEFAULT_LOCALE } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/get-dictionary';
 import type { ApiResponse } from '@/types/api';
@@ -16,8 +16,7 @@ export default function AgeVerifyPage({
   params: Promise<{ locale: string }>;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/';
+  const callbackUrl = '/';
 
   // 使用 useState 管理语言（客户端组件无法 await params）
   const [locale] = useState<'zh' | 'en'>(() => {

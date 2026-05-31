@@ -5,13 +5,6 @@ interface AdminCategoriesPageProps {
   params: Promise<{ locale: Locale }>;
 }
 
-async function deleteCategory(formData: FormData) {
-  'use server';
-  const id = formData.get('id') as string;
-  const db = await getDB();
-  await db.prepare('DELETE FROM categories WHERE id = ? AND slug != ?').bind(id, 'adult').run();
-}
-
 /**
  * 版块管理页
  * 版块列表 + 编辑排序 + 新增/编辑弹窗
@@ -96,16 +89,9 @@ export default async function AdminCategoriesPage({ params }: AdminCategoriesPag
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <form action={deleteCategory}>
-                          <input type="hidden" name="id" value={cat.id as string} />
-                          {(cat.slug as string) !== 'adult' && (
-                            <button className="text-xs text-red-400 hover:underline">
-                              {locale === 'en' ? 'Delete' : '删除'}
-                            </button>
-                          )}
-                        </form>
-                      </div>
+                      <span className="text-xs text-text-secondary">
+                        {locale === 'en' ? 'Read only' : '只读'}
+                      </span>
                     </td>
                   </tr>
                 );

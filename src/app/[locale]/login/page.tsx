@@ -7,13 +7,10 @@ import { LoginForm } from '@/components/auth/LoginForm';
  */
 export default async function LoginPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ callbackUrl?: string; error?: string; registered?: string }>;
 }) {
   const { locale: localeParam } = await params;
-  const search = await searchParams;
   const locale = isValidLocale(localeParam) ? localeParam : DEFAULT_LOCALE;
   const dict = await getDictionary(locale);
 
@@ -27,23 +24,9 @@ export default async function LoginPage({
           <p className="text-text-secondary">{dict.auth.loginSubtitle}</p>
         </div>
 
-        {search.registered === '1' && (
-          <div className="mb-4 rounded-lg bg-green-500/10 p-3 text-sm text-green-400">
-            {locale === 'en' ? 'Registration successful! Please log in.' : '注册成功！请登录。'}
-          </div>
-        )}
-        {search.error && (
-          <div className="mb-4 rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
-            {search.error === 'CredentialsSignin'
-              ? (locale === 'en' ? 'Incorrect email or password' : '邮箱或密码错误')
-              : dict.common.error}
-          </div>
-        )}
-
         <LoginForm
           dict={dict}
           locale={locale}
-          callbackUrl={search.callbackUrl}
         />
       </div>
     </div>

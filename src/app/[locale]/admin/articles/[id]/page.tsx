@@ -1,6 +1,9 @@
 import { getDB } from '@/lib/db/client';
-import { apiNotFound } from '@/lib/utils/api';
 import type { Locale } from '@/lib/i18n/config';
+
+export async function generateStaticParams() {
+  return [{ locale: 'zh', id: 'placeholder' }, { locale: 'en', id: 'placeholder' }];
+}
 
 interface AdminArticleDetailPageProps {
   params: Promise<{ locale: Locale; id: string }>;
@@ -160,45 +163,21 @@ export default async function AdminArticleDetailPage({ params }: AdminArticleDet
         </div>
       </div>
 
-      {/* 状态管理表单 */}
+      {/* 状态管理 */}
       <div className="glass rounded-dream p-6">
         <h2 className="mb-4 text-base font-semibold text-text-primary">
           {locale === 'en' ? 'Status Management' : '状态管理'}
         </h2>
-        <form className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-wrap items-end gap-4">
           <div>
             <label className="mb-1 block text-xs text-text-secondary">
-              {locale === 'en' ? 'Change Status' : '修改状态'}
+              {locale === 'en' ? 'Status' : '状态'}
             </label>
-            <select
-              name="status"
-              defaultValue={String(a.status ?? '')}
-              className="rounded-lg border border-[var(--color-border)] bg-dream-darker px-3 py-2 text-sm text-text-primary outline-none focus:border-accent-start"
-            >
-              <option value="published">{locale === 'en' ? 'Published' : '已发布'}</option>
-              <option value="draft">{locale === 'en' ? 'Draft' : '草稿'}</option>
-              <option value="archived">{locale === 'en' ? 'Archived' : '已归档'}</option>
-              <option value="rejected">{locale === 'en' ? 'Rejected' : '已拒绝'}</option>
-            </select>
+            <div className="rounded-lg border border-[var(--color-border)] bg-dream-darker px-3 py-2 text-sm text-text-primary">
+              {String(a.status ?? '')}
+            </div>
           </div>
-          <button
-            type="submit"
-            formAction={async (formData) => {
-              'use server';
-              const newStatus = formData.get('status') as string;
-  const db = await getDB();
-              await db
-                .prepare("UPDATE articles SET status = ?, updated_at = datetime('now') WHERE id = ?")
-                .bind(newStatus, id)
-                .run();
-              const { revalidatePath } = await import('next/cache');
-              revalidatePath(`/${locale}/admin/articles/${id}`);
-            }}
-            className="rounded-lg bg-gradient-to-r from-accent-start to-accent-end px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          >
-            {locale === 'en' ? 'Update Status' : '更新状态'}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

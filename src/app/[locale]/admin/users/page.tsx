@@ -1,63 +1,27 @@
 import { getDB } from '@/lib/db/client';
-import { revalidatePath } from 'next/cache';
 import type { Locale } from '@/lib/i18n/config';
-
-async function toggleBan(formData: FormData) {
-  'use server';
-  const id = formData.get('id') as string;
-  const action = formData.get('action') as string;
-  const locale = formData.get('locale') as string;
-  const db = await getDB();
-  const newRole = action === 'ban' ? 'banned' : 'user';
-  await db.prepare('UPDATE users SET role = ? WHERE id = ?').bind(newRole, id).run();
-  const logId = crypto.randomUUID();
-  await db
-    .prepare('INSERT INTO audit_logs (id, target_type, target_id, action, operator_id, reason) VALUES (?, ?, ?, ?, ?, ?)')
-    .bind(logId, 'user', id, action, 'admin', null)
-    .run();
-  revalidatePath(`/${locale}/admin/users`);
-}
 
 interface AdminUsersPageProps {
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ page?: string; role?: string; search?: string }>;
 }
 
 /**
  * 用户管理列表页
  * 表格：用户名/邮箱/角色/状态/注册时间/操作
  */
-export default async function AdminUsersPage({ params, searchParams }: AdminUsersPageProps) {
+export default async function AdminUsersPage({ params }: AdminUsersPageProps) {
   const { locale } = await params;
-  const filters = await searchParams;
   const db = await getDB();
 
-  const page = Math.max(1, parseInt(filters.page ?? '1', 10));
+  const page = 1;
   const pageSize = 20;
-  const offset = (page - 1) * pageSize;
-  const roleFilter = filters.role ?? '';
-  const searchFilter = filters.search ?? '';
-
-  // 构建 WHERE 条件
-  const conditions: string[] = [];
-  const bindParams: unknown[] = [];
-
-  if (roleFilter) {
-    conditions.push('role = ?');
-    bindParams.push(roleFilter);
-  }
-
-  if (searchFilter) {
-    conditions.push('(name LIKE ? OR email LIKE ?)');
-    bindParams.push(`%${searchFilter}%`, `%${searchFilter}%`);
-  }
-
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+  const offset = 0;
+  const roleFilter = '';
+  const searchFilter = '';
 
   // 查询总数
   const countResult = await db
-    .prepare(`SELECT COUNT(*) as total FROM users ${whereClause}`)
-    .bind(...bindParams)
+    .prepare('SELECT COUNT(*) as total FROM users')
     .first();
   const total = (countResult as Record<string, number>)?.total ?? 0;
 
@@ -66,11 +30,10 @@ export default async function AdminUsersPage({ params, searchParams }: AdminUser
     .prepare(
       `SELECT id, name, email, avatar_url, role, locale, age_verified, created_at
        FROM users
-       ${whereClause}
        ORDER BY created_at DESC
        LIMIT ? OFFSET ?`
     )
-    .bind(...bindParams, pageSize, offset)
+    .bind(pageSize, offset)
     .all();
 
   const totalPages = Math.ceil(total / pageSize);
@@ -165,24 +128,9 @@ export default async function AdminUsersPage({ params, searchParams }: AdminUser
                       {(user.created_at as string).slice(0, 10)}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {user.role !== 'admin' && (
-                          <form action={toggleBan}>
-                            <input type="hidden" name="id" value={user.id as string} />
-                            <input type="hidden" name="locale" value={locale} />
-                            {(user.role as string) === 'banned' ? (
-                              <input type="hidden" name="action" value="unban" />
-                            ) : (
-                              <input type="hidden" name="action" value="ban" />
-                            )}
-                            <button className="text-xs text-red-400 hover:underline">
-                              {(user.role as string) === 'banned'
-                                ? (locale === 'en' ? 'Unban' : '解封')
-                                : (locale === 'en' ? 'Ban' : '封禁')}
-                            </button>
-                          </form>
-                        )}
-                      </div>
+                      <span className="text-xs text-text-secondary">
+                        {locale === 'en' ? 'View-only' : '只读'}
+                      </span>
                     </td>
                   </tr>
                 );

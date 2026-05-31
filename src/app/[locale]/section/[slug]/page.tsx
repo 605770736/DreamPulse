@@ -6,22 +6,23 @@ import { SectionHeader } from '@/components/section/SectionHeader';
 import { Pagination } from '@/components/ui/Pagination';
 import type { ArticleRow, CategoryRow } from '@/lib/db/schema';
 
+export async function generateStaticParams() {
+  return [{ locale: 'zh', slug: 'tech' }, { locale: 'en', slug: 'tech' }];
+}
+
 /**
  * 版块页——按 slug 筛选文章，支持分页
  */
 export default async function SectionPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale: localeParam, slug } = await params;
-  const search = await searchParams;
   const locale = isValidLocale(localeParam) ? localeParam : DEFAULT_LOCALE;
   const dict = await getDictionary(locale);
 
-  const page = Math.max(1, parseInt(search.page ?? '1', 10) || 1);
+  const page = 1;
   const pageSize = 20;
 
   // 查询版块信息
