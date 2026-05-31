@@ -3,25 +3,44 @@ import type { Locale } from '@/lib/i18n/config';
 
 interface AdminArticlesPageProps {
   params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ page?: string; status?: string; search?: string }>;
 }
 
 /**
  * 文章管理列表页
  * 表格：标题/版块/状态/创建时间/操作，支持筛选和搜索
  */
-export default async function AdminArticlesPage({ params }: AdminArticlesPageProps) {
+export default async function AdminArticlesPage({ params, searchParams }: AdminArticlesPageProps) {
   const { locale } = await params;
+  const filters = await searchParams;
   const db = await getDB();
 
-  const page = 1;
+  const page = Math.max(1, parseInt(filters.page ?? '1', 10));
   const pageSize = 20;
-  const offset = 0;
-  const statusFilter = '';
-  const searchFilter = '';
+  const offset = (page - 1) * pageSize;
+  const statusFilter = filters.status ?? '';
+  const searchFilter = filters.search ?? '';
+
+  // 构建 WHERE 条件
+  const conditions: string[] = [];
+  const bindParams: unknown[] = [];
+
+  if (statusFilter) {
+    conditions.push('a.status = ?');
+    bindParams.push(statusFilter);
+  }
+
+  if (searchFilter) {
+    conditions.push('(a.title LIKE ? OR a.title_en LIKE ?)');
+    bindParams.push(`%${searchFilter}%`, `%${searchFilter}%`);
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   // 查询总数
   const countResult = await db
-    .prepare('SELECT COUNT(*) as total FROM articles a')
+    .prepare(`SELECT COUNT(*) as total FROM articles a ${whereClause}`)
+    .bind(...bindParams)
     .first();
   const total = (countResult as Record<string, number>)?.total ?? 0;
 
@@ -32,10 +51,11 @@ export default async function AdminArticlesPage({ params }: AdminArticlesPagePro
               c.name as category_name, c.name_en as category_name_en
        FROM articles a
        LEFT JOIN categories c ON a.category_id = c.id
+       ${whereClause}
        ORDER BY a.created_at DESC
        LIMIT ? OFFSET ?`
     )
-    .bind(pageSize, offset)
+    .bind(...bindParams, pageSize, offset)
     .all();
 
   const totalPages = Math.ceil(total / pageSize);

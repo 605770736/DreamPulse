@@ -1,15 +1,12 @@
 import { query, queryOne, execute } from '@/lib/db/client';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { isValidLocale, DEFAULT_LOCALE } from '@/lib/i18n/config';
+import { auth } from '@/lib/auth/config';
 import { ArticleContent } from '@/components/article/ArticleContent';
 import { ActionBar } from '@/components/article/ActionBar';
 import { RelatedArticles } from '@/components/article/RelatedArticles';
 import { CommentSection } from '@/components/article/CommentSection';
 import type { ArticleRow, CategoryRow } from '@/lib/db/schema';
-
-export async function generateStaticParams() {
-  return [{ locale: 'zh', id: 'placeholder' }, { locale: 'en', id: 'placeholder' }];
-}
 
 /**
  * 文章详情页——AI 摘要、原文链接、互动栏、相关推荐
@@ -39,6 +36,9 @@ export default async function ArticlePage({
       </div>
     );
   }
+
+  // 获取当前登录用户
+  const session = await auth();
 
   // 查询版块信息
   const category = await queryOne<CategoryRow>(
@@ -125,6 +125,7 @@ export default async function ArticlePage({
       <CommentSection
         articleId={id}
         locale={locale}
+        currentUserId={session?.user?.id}
       />
     </div>
   );
